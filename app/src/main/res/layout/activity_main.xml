@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.example.paint.DrawingView
+        android:id="@+id/drawingView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="#80FFFFFF">
+
+        <Button
+            android:id="@+id/btnUndo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deshacer" />
+
+        <Button
+            android:id="@+id/btnRedo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rehacer"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Limpiar"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/btnBlack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Negro"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/btnRed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rojo"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+</FrameLayout>
+
