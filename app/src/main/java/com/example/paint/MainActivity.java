@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnClear = findViewById(R.id.btnClear);
         Button btnBlack = findViewById(R.id.btnBlack);
         Button btnRed   = findViewById(R.id.btnRed);
+        Button btnBlue  = findViewById(R.id.btnBlue);
 
         // Conectamos cada botón con una acción sobre el lienzo:
         btnUndo.setOnClickListener(v -> drawingView.undo());                 // Deshacer último trazo.
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         btnClear.setOnClickListener(v -> drawingView.clearCanvas());         // Borrar todo.
         btnBlack.setOnClickListener(v -> drawingView.setStrokeColor(Color.BLACK)); // Cambiar a negro.
         btnRed.setOnClickListener(v -> drawingView.setStrokeColor(Color.RED));     // Cambiar a rojo.
+        btnBlue.setOnClickListener(v -> drawingView.setStrokeColor(Color.BLUE));   // Corregido para cambiar a azul.
 
         // Nota: Si quieres cambiar el grosor desde aquí, puedes llamar:
         // drawingView.setStrokeWidth(20f); // por ejemplo, 20 píxeles.

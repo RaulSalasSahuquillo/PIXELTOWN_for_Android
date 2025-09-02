@@ -4,54 +4,86 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- El DrawingView se queda igual, ocupando todo el fondo -->
     <com.example.paint.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Contenedor principal para todos los botones en la parte inferior -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="#80FFFFFF">
+        android:background="#80FFFFFF"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <Button
-            android:id="@+id/btnUndo"
-            android:layout_width="wrap_content"
+        <!-- Fila superior para los botones de colores -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Deshacer" />
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-        <Button
-            android:id="@+id/btnRedo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rehacer"
-            android:layout_marginStart="8dp" />
+            <!-- Para que los botones se repartan el espacio, usamos layout_weight -->
+            <Button
+                android:id="@+id/btnBlack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Negro" />
 
-        <Button
-            android:id="@+id/btnClear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Limpiar"
-            android:layout_marginStart="8dp" />
+            <Button
+                android:id="@+id/btnRed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Rojo" />
 
-        <Button
-            android:id="@+id/btnBlack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Negro"
-            android:layout_marginStart="8dp" />
+            <Button
+                android:id="@+id/btnBlue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Azul" />
 
-        <Button
-            android:id="@+id/btnRed"
-            android:layout_width="wrap_content"
+        </LinearLayout>
+
+        <!-- Fila inferior para los botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Rojo"
-            android:layout_marginStart="8dp" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnUndo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Deshacer" />
+
+            <Button
+                android:id="@+id/btnRedo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Rehacer" />
+
+            <Button
+                android:id="@+id/btnClear"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Limpiar" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </FrameLayout>
-
