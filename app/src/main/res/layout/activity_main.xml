@@ -4,14 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- El DrawingView se queda igual, ocupando todo el fondo -->
+    <!-- Lienzo -->
     <com.example.paint.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Contenedor principal para todos los botones en la parte inferior -->
+    <!-- Casa arrastrable: está sobre el lienzo y empieza oculta -->
+    <ImageView
+        android:id="@+id/imgCasa"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:src="@drawable/casa"
+        android:visibility="gone"
+        android:contentDescription="@string/app_name" />
+
+    <!-- Botonera inferior (SIEMPRE arriba del resto) -->
     <LinearLayout
+        android:id="@+id/panelBotonera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -19,41 +30,37 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Fila superior para los botones de colores -->
+        <!-- Fila superior: Colores + Construir -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
 
-            <!-- Para que los botones se repartan el espacio, usamos layout_weight -->
-            <Button
-                android:id="@+id/btnBlack"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Colores"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerColors"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="Negro" />
+                android:entries="@array/color_names" />
 
             <Button
-                android:id="@+id/btnRed"
-                android:layout_width="0dp"
+                android:id="@+id/btnConstruir"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="Rojo" />
-
-            <Button
-                android:id="@+id/btnBlue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Azul" />
-
+                android:layout_marginStart="12dp"
+                android:text="Construir"/>
         </LinearLayout>
 
-        <!-- Fila inferior para los botones de acción -->
+        <!-- Fila inferior: acciones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,8 +89,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Limpiar" />
-
         </LinearLayout>
-
     </LinearLayout>
 </FrameLayout>

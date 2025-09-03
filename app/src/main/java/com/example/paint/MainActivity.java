@@ -1,59 +1,137 @@
 package com.example.paint;
-// Debe coincidir con el paquete de DrawingView y con tu estructura de carpetas.
 
-import android.graphics.Color;                 // Para usar Color.BLACK, Color.RED, etc.
-import android.os.Bundle;                      // Estado/paquete de datos de la Activity.
-import androidx.activity.EdgeToEdge;           // Para usar pantalla completa con barras superpuestas.
-import androidx.appcompat.app.AppCompatActivity;// Activity base con compatibilidad amplia.
-import androidx.core.graphics.Insets;          // Medidas de barras de sistema.
-import androidx.core.view.ViewCompat;          // Utilidades para vistas.
-import androidx.core.view.WindowInsetsCompat;  // Acceso a "insets" (barras de estado/navegación).
-import android.widget.Button;                  // Botones de la UI.
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;   // <-- IMPORTA ESTO
+import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.Spinner;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    // onCreate es el "punto de entrada" cuando se crea la pantalla.
+    // offsets para arrastrar
+    private float dX, dY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); // Llama al comportamiento base.
-
-        // Activa el modo "Edge-to-Edge" para que el contenido pueda ocupar toda la pantalla,
-        // y luego nosotros ajustamos los márgenes con los insets del sistema.
+        super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
-        // Asocia esta Activity con el archivo de diseño res/layout/activity_main.xml
         setContentView(R.layout.activity_main);
 
-        // Ajusta automáticamente el padding de la vista raíz para no quedar
-        // ocultos por la barra de estado o la barra de navegación.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            // Obtiene el tamaño de las barras del sistema (arriba, abajo, lados).
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Aplica ese espacio como padding, así el contenido no se tapa.
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets; // Devuelve los insets para que el sistema sepa que ya los consumimos.
+            return insets;
         });
 
-        // Obtenemos la referencia al lienzo (nuestra vista personalizada) por su id en XML.
+        // --- UI ---
         DrawingView drawingView = findViewById(R.id.drawingView);
+        Button btnUndo          = findViewById(R.id.btnUndo);
+        Button btnRedo          = findViewById(R.id.btnRedo);
+        Button btnClear         = findViewById(R.id.btnClear);
+        Button btnConstruir     = findViewById(R.id.btnConstruir);
+        Spinner spinner         = findViewById(R.id.spinnerColors);
+        View root               = findViewById(R.id.main);
+        View panelBotonera      = findViewById(R.id.panelBotonera);
 
-        // Obtenemos referencias a los botones (también por id, definidos en el XML).
-        Button btnUndo  = findViewById(R.id.btnUndo);
-        Button btnRedo  = findViewById(R.id.btnRedo);
-        Button btnClear = findViewById(R.id.btnClear);
-        Button btnBlack = findViewById(R.id.btnBlack);
-        Button btnRed   = findViewById(R.id.btnRed);
-        Button btnBlue  = findViewById(R.id.btnBlue);
+        // --- acciones dibujo ---
+        btnUndo.setOnClickListener(v -> drawingView.undo());
+        btnRedo.setOnClickListener(v -> drawingView.redo());
+        btnClear.setOnClickListener(v -> drawingView.clearCanvas());
 
-        // Conectamos cada botón con una acción sobre el lienzo:
-        btnUndo.setOnClickListener(v -> drawingView.undo());                 // Deshacer último trazo.
-        btnRedo.setOnClickListener(v -> drawingView.redo());                 // Rehacer trazo deshecho.
-        btnClear.setOnClickListener(v -> drawingView.clearCanvas());         // Borrar todo.
-        btnBlack.setOnClickListener(v -> drawingView.setStrokeColor(Color.BLACK)); // Cambiar a negro.
-        btnRed.setOnClickListener(v -> drawingView.setStrokeColor(Color.RED));     // Cambiar a rojo.
-        btnBlue.setOnClickListener(v -> drawingView.setStrokeColor(Color.BLUE));   // Corregido para cambiar a azul.
+        // --- spinner colores ---
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.color_names, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                String name = parent.getItemAtPosition(pos).toString();
+                int c;
+                switch (name) {
+                    case "Rojo":     c = Color.RED; break;
+                    case "Azul":     c = Color.BLUE; break;
+                    case "Verde":    c = Color.GREEN; break;
+                    case "Amarillo": c = Color.YELLOW; break;
+                    case "Magenta":  c = Color.MAGENTA; break;
+                    default:         c = Color.BLACK; break;
+                }
+                drawingView.setStrokeColor(c);
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) { }
+        });
 
-        // Nota: Si quieres cambiar el grosor desde aquí, puedes llamar:
-        // drawingView.setStrokeWidth(20f); // por ejemplo, 20 píxeles.
+        // --- menú Construir ---
+        btnConstruir.setOnClickListener(v -> {
+            PopupMenu menu = new PopupMenu(this, v);
+            menu.getMenuInflater().inflate(R.menu.menu_construir, menu.getMenu());
+            menu.setOnMenuItemClickListener((MenuItem item) -> {
+                if (item.getItemId() == R.id.action_casa) {
+                    // Crear una nueva casa dinámicamente
+                    ImageView nuevaCasa = new ImageView(this);
+                    nuevaCasa.setImageResource(R.drawable.casa);
+
+                    // Tamaño en dp -> px (p.ej. 96dp)
+                    int sizePx = dp(96);
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(sizePx, sizePx);
+                    nuevaCasa.setLayoutParams(params);
+
+                    // Añadir al root (FrameLayout)
+                    ((FrameLayout) root).addView(nuevaCasa);
+
+                    // Centrar por encima de la botonera cuando esté medido
+                    root.post(() -> {
+                        float cx = (root.getWidth() - nuevaCasa.getWidth()) / 2f;
+                        float maxY = root.getHeight() - panelBotonera.getHeight() - nuevaCasa.getHeight();
+                        float cy = Math.max(0, maxY / 2f);
+                        nuevaCasa.setX(Math.max(0, cx));
+                        nuevaCasa.setY(cy);
+                    });
+
+                    // Hacer arrastrable con límites
+                    nuevaCasa.setOnTouchListener((viewTouch, event) -> {
+                        switch (event.getActionMasked()) {
+                            case MotionEvent.ACTION_DOWN:
+                                dX = viewTouch.getX() - event.getRawX();
+                                dY = viewTouch.getY() - event.getRawY();
+                                return true;
+                            case MotionEvent.ACTION_MOVE:
+                                float newX = event.getRawX() + dX;
+                                float newY = event.getRawY() + dY;
+                                float maxX2 = root.getWidth() - viewTouch.getWidth();
+                                float maxY2 = root.getHeight() - panelBotonera.getHeight() - viewTouch.getHeight();
+                                viewTouch.setX(Math.max(0, Math.min(newX, maxX2)));
+                                viewTouch.setY(Math.max(0, Math.min(newY, maxY2)));
+                                return true;
+                        }
+                        return false;
+                    });
+
+                    return true;
+                }
+                return false;
+            });
+            menu.show();
+        });
+    }
+
+    // helper: dp a px
+    private int dp(int dp) {
+        return Math.round(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
     }
 }
+

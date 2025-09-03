@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Paint</string>
+
+    <string-array name="color_names">
+        <item>Negro</item>
+        <item>Rojo</item>
+        <item>Azul</item>
+        <item>Verde</item>
+        <item>Amarillo</item>
+        <item>Magenta</item>
+    </string-array>
 </resources>
