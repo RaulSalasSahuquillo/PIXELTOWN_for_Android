@@ -2,6 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_casa"
-        android:title="Casa" />
-    <!-- Aquí podrás añadir más: árbol, carretera, etc. -->
+        android:title="Casa | 1000Հ" />
+    <item
+        android:id="@+id/action_tarraco"
+        android:title="Tarraco | 50000Հ" />
+    <item
+        android:id="@+id/action_ayuntamiento"
+        android:title="Ayuntamiento | 10000Հ" />
+    <item
+        android:id="@+id/action_primaprix"
+        android:title="PrimaPrix | 5000Հ" />
+    <item
+        android:id="@+id/action_esclat"
+        android:title="Esclat | 7000Հ" />
+    <item
+        android:id="@+id/action_marvimundo"
+        android:title="Marvimundo | 8000Հ" />
+
 </menu>
