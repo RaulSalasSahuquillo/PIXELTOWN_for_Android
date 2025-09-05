@@ -17,18 +17,22 @@ import android.widget.FrameLayout;         // Contenedor que apila vistas (como 
 import android.widget.ImageView;           // Para mostrar imágenes en pantalla.
 import android.widget.PopupMenu;           // Menú contextual emergente anclado a un botón.
 import android.widget.Spinner;             // Desplegable para elegir una opción (colores).
-
+import androidx.appcompat.app.AlertDialog;
 import androidx.activity.EdgeToEdge;       // Permite que la UI ocupe toda la pantalla.
 import androidx.appcompat.app.AppCompatActivity; // Clase base de una pantalla (Activity).
 import androidx.core.graphics.Insets;      // Tamaños de las barras del sistema (status/nav).
 import androidx.core.view.ViewCompat;      // Utilidades para trabajar con vistas de forma moderna.
 import androidx.core.view.WindowInsetsCompat; // Acceso unificado a los "insets" del sistema.
+import android.widget.Toast;
 
 /*
  * Una Activity es una PANTALLA de tu app.
  * MainActivity es la pantalla principal que se lanza al abrir la app.
  */
 public class MainActivity extends AppCompatActivity {
+    private int money = 10000;   // saldo inicial
+    private int experience = 0;    // puntos de experiencia
+    private int buildingsCount = 0;
 
     // Variables para recordar el desplazamiento entre el dedo y la vista al arrastrar.
     // dX y dY nos ayudan a que el objeto no "salte" cuando lo cogemos.
@@ -38,7 +42,16 @@ public class MainActivity extends AppCompatActivity {
      * onCreate es el punto de entrada cuando Android crea esta pantalla.
      * Aquí "inflamos" el layout, buscamos vistas por id, y conectamos la lógica.
      */
-    @Override
+    private void showStatsDialog() {
+        String msg = "Dinero: " + money + " Հ"
+                + "\nExperiencia: " + experience
+                + "\nEdificios: " + buildingsCount;
+        new AlertDialog.Builder(this)
+                .setTitle("Estadísticas")
+                .setMessage(msg)
+                .setPositiveButton("SALIR", null)
+                .show();
+    }
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);     // Llama al comportamiento base de AppCompatActivity.
 
@@ -66,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         // Está definida en el XML con <com.example.paint.DrawingView .../>
         DrawingView drawingView = findViewById(R.id.drawingView);
 
-        // Botones de la fila inferior (Deshacer / Rehacer / Limpiar)
-        Button btnUndo      = findViewById(R.id.btnUndo);
+        // Botones de la fila inferior (Stats / Rehacer / Limpiar)
+        Button btnStats      = findViewById(R.id.btnStats);
         Button btnRedo      = findViewById(R.id.btnRedo);
         Button btnClear     = findViewById(R.id.btnClear);
 
@@ -87,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         // ----------- 2) CONECTAR BOTONES DEL LIENZO A SUS ACCIONES -----------
 
         // setOnClickListener “escucha” pulsaciones. Con lambda (Java 8) queda más corto.
-        btnUndo.setOnClickListener(v -> drawingView.undo());          // Deshacer último trazo.
+        btnStats.setOnClickListener(v -> showStatsDialog());
         btnRedo.setOnClickListener(v -> drawingView.redo());          // Rehacer lo deshecho.
         btnClear.setOnClickListener(v -> drawingView.clearCanvas());  // Borrar todo el lienzo.
 
@@ -133,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) { }
         });
 
+
         // ----------- 4) MENÚ "CONSTRUIR" QUE CREA NUEVOS EDIFICIOS -----------
 
         // Al pulsar el botón Construir, mostramos un PopupMenu anclado al botón.
@@ -149,32 +163,68 @@ public class MainActivity extends AppCompatActivity {
 
                 // Si elige "Casa"
                 if (itemId == R.id.action_casa) {
-                    crearEdificio(root, panelBotonera, R.drawable.casa, 96); // 96dp
+                    if (money >= 1000) {
+                        money = money - 1000;
+                        experience = experience + 10;
+                        crearEdificio(root, panelBotonera, R.drawable.casa, 96); // 96dp
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
                 // Si elige "Tarraco"
                 else if (itemId == R.id.action_tarraco) {
-                    crearEdificio(root, panelBotonera, R.drawable.tarraco, 120); // 120dp
+                    if (money >= 50000) {
+                        money = money - 50000;
+                        experience = experience + 500;
+                        crearEdificio(root, panelBotonera, R.drawable.tarraco, 120); // 120dp
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
                 // Si elige "Ayuntamiento"
                 else if (itemId == R.id.action_ayuntamiento) {
-                    crearEdificio(root, panelBotonera, R.drawable.ayuntamiento, 120);
+                    if (money >= 20000) {
+                        money = money - 20000;
+                        experience = experience + 100;
+                        crearEdificio(root, panelBotonera, R.drawable.ayuntamiento, 120);
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
                 // Si elige "PrimaPrix"
                 else if (itemId == R.id.action_primaprix) {
-                    crearEdificio(root, panelBotonera, R.drawable.primaprix, 120);
+                    if (money >= 5000) {
+                        money = money - 5000;
+                        experience = experience + 30;
+                        crearEdificio(root, panelBotonera, R.drawable.primaprix, 120);
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
                 // Si elige "Esclat"
                 else if (itemId == R.id.action_esclat) {
-                    crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
+                    if (money >= 6000){
+                        money = money - 6000;
+                        experience = experience + 30;
+                        crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
                 // Si elige "Marvimundo"
                 else if (itemId == R.id.action_marvimundo) {
-                    crearEdificio(root, panelBotonera, R.drawable.marvimundo, 120);
+                    if (money >= 7000){
+                        money = money - 7000;
+                        experience = experience + 30;
+                        crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
+                    } else {
+                        crearEdificio(root, panelBotonera, R.drawable.marvimundo, 120);
+                    }
                     return true;
                 }
 
@@ -206,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
         // ----- C) Añadir al contenedor principal -----
         ((FrameLayout) root).addView(edificio);
+        buildingsCount++;
 
         // ----- D) Posición inicial (centrado en zona útil) -----
         root.post(() -> {

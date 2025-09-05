@@ -14,9 +14,9 @@
         android:title="PrimaPrix | 5000Հ" />
     <item
         android:id="@+id/action_esclat"
-        android:title="Esclat | 7000Հ" />
+        android:title="Esclat | 6000Հ" />
     <item
         android:id="@+id/action_marvimundo"
-        android:title="Marvimundo | 8000Հ" />
+        android:title="Marvimundo | 7000Հ" />
 
 </menu>
