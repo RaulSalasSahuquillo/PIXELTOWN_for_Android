@@ -45,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
     private int policia = 0;
     private int impuestos = 0;
     private int tienda = 0;
+    private int porcentajeimpuestos = 15;
+    private int dinero1 = 1000;
+    private int dinero2 = 34000;
+    private int dinerototal = 0;
 
     // Variables para recordar el desplazamiento entre el dedo y la vista al arrastrar.
     // dX y dY nos ayudan a que el objeto no "salte" cuando lo cogemos.
@@ -60,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 + "\nEdificios: " + buildingsCount
                 + "\nFelicidad: " + happiness + " %"
                 + "\nRonda: " + ronda
-                + "\nPoblación: " + poblation;
+                + "\nPoblación: " + poblation
+                + "\nImpuestos: " + porcentajeimpuestos + " %";
         new AlertDialog.Builder(this)
                 .setTitle("Estadísticas")
                 .setMessage(msg)
@@ -195,6 +200,9 @@ public class MainActivity extends AppCompatActivity {
         btnRonda.setOnClickListener(v -> {
             if (ronda == 1 && casas == 3) {
                 ronda++;
+                dinerototal = dinero1 + dinero2;
+                money = money + dinerototal * porcentajeimpuestos / 100;
+                happiness --;
                 Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
@@ -202,6 +210,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (ronda == 2 && ayuntamiento == 1 && tienda == 1) {
                 ronda++;
+                dinerototal = dinero1 + dinero2;
+                money = money + dinerototal * porcentajeimpuestos / 100;
+                happiness --;
                 Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
@@ -209,6 +220,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (ronda == 3 && farolas == 4 && seguridad == 4){
                 ronda ++;
+                dinerototal = dinero1 + dinero2;
+                money = money + dinerototal * porcentajeimpuestos / 100;
+                happiness --;
                 Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
@@ -216,6 +230,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (ronda == 4 && estacionpolicial == 1 && policia == 1 && casas == 4) {
                 ronda ++;
+                dinerototal = dinero1 + dinero2;
+                money = money + dinerototal * porcentajeimpuestos / 100;
+                happiness --;
                 Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
@@ -360,7 +377,33 @@ public class MainActivity extends AppCompatActivity {
                         crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
                         happiness ++;
                     } else {
-                        crearEdificio(root, panelBotonera, R.drawable.marvimundo, 120);
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        happiness --;
+                    }
+                    return true;
+                }
+                // Si elige "Estación de policía"
+                else if (itemId == R.id.action_estacion) {
+                    if (money >= 8000){
+                        money = money - 8000;
+                        experience = experience + 35;
+                        crearEdificio(root, panelBotonera, R.drawable.estacionpolicial, 120);
+                        happiness ++;
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        happiness --;
+                    }
+                    return true;
+                }
+                // Si elige "Cámara de seguridad"
+                else if (itemId == R.id.action_camara) {
+                    if (money >= 50){
+                        money = money - 50;
+                        experience = experience + 5;
+                        crearEdificio(root, panelBotonera, R.drawable.camaradeseguridad, 50);
+                        happiness ++;
+                    } else {
+                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --;
                     }
                     return true;

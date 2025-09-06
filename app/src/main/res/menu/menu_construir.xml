@@ -18,5 +18,11 @@
     <item
         android:id="@+id/action_marvimundo"
         android:title="Marvimundo | 7000Հ" />
+    <item
+        android:id="@+id/action_estacion"
+        android:title="Estación de policía | 8000Հ" />
+    <item
+        android:id="@+id/action_camara"
+        android:title="Cámara de seguridad | 50Հ" />
 
 </menu>
