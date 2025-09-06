@@ -76,19 +76,19 @@
                 android:text="Estatus" />
 
             <Button
-                android:id="@+id/btnRedo"
-                android:layout_width="0dp"
+                android:id="@+id/btnRonda"
+                android:layout_width="1dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="Rehacer" />
+                android:text="Nueva Ronda" />
 
             <Button
-                android:id="@+id/btnClear"
+                android:id="@+id/btnMission"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Limpiar" />
+                android:text="Misiones" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

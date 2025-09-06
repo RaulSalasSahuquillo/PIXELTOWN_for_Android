@@ -33,6 +33,18 @@ public class MainActivity extends AppCompatActivity {
     private int money = 10000;   // saldo inicial
     private int experience = 0;    // puntos de experiencia
     private int buildingsCount = 0;
+    private int happiness = 50;
+    private int ronda = 1;
+    private int tarraco = 0;
+    private int poblation = 3;
+    private int casas = 0;
+    private int ayuntamiento = 1;
+    private int farolas = 0;
+    private int seguridad = 0;
+    private int estacionpolicial = 0;
+    private int policia = 0;
+    private int impuestos = 0;
+    private int tienda = 0;
 
     // Variables para recordar el desplazamiento entre el dedo y la vista al arrastrar.
     // dX y dY nos ayudan a que el objeto no "salte" cuando lo cogemos.
@@ -45,13 +57,91 @@ public class MainActivity extends AppCompatActivity {
     private void showStatsDialog() {
         String msg = "Dinero: " + money + " Հ"
                 + "\nExperiencia: " + experience
-                + "\nEdificios: " + buildingsCount;
+                + "\nEdificios: " + buildingsCount
+                + "\nFelicidad: " + happiness + " %"
+                + "\nRonda: " + ronda
+                + "\nPoblación: " + poblation;
         new AlertDialog.Builder(this)
                 .setTitle("Estadísticas")
                 .setMessage(msg)
                 .setPositiveButton("SALIR", null)
                 .show();
     }
+
+    private void showMission() {
+        if (ronda == 1){
+            String msg = "Hay 3 habitantes (incluyéndote a tí). ¿Qué te parece si empezamos construyendo 3 casas?";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        }
+        if (ronda == 2 && ayuntamiento == 0) {
+            String msg = "¿Pero cómo vas a gobernar? ¿Qué te parece si construimos un ayuntamiento?";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        } else if ( ronda == 2 && ayuntamiento == 1) {
+            String msg = "Haz tu primer paso como gobernador. Construye una tienda";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        }
+        if (ronda == 3 && farolas == 0 && seguridad == 0) {
+            String msg = "La gente se está quejando de que no ve por la noche. Construye 4 farolas alrededor la la ciudad";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        } else if (ronda == 3 && farolas == 4 && seguridad == 0){
+            String msg = "¡Muy buena inversión! La gente todavía se siente insegura por la noche. Pon 5 cámeras de seguridad. 4 de ellas en las farolas y la quinta en el ayuntamiento.";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        }
+        if (ronda == 4 && estacionpolicial == 0) {
+            String msg = "¿Pero quién va a controlar las cámeras? Pon una estación de policía";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        } else if (ronda == 4 && estacionpolicial == 1 && policia == 0) {
+            String msg = "¡Pero tienes que contratar a un policía!";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        } else if (ronda == 4 && estacionpolicial == 1 && policia == 1 && casas == 3) {
+            String msg = "¡Pero qué son estos modales! Construye una casa para el policía, ya que él es un habitante más.";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        }
+        if (ronda == 5 && impuestos == 0) {
+            String msg = "¡Estás progresando muuuucho! ¡Sube los impuestos para ganar más dinero!";
+            new AlertDialog.Builder(this)
+                    .setTitle("Misiones")
+                    .setMessage(msg)
+                    .setPositiveButton("MANOS A LA OBRA", null)
+                    .show();
+        }
+
+
+    }
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);     // Llama al comportamiento base de AppCompatActivity.
 
@@ -81,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Botones de la fila inferior (Stats / Rehacer / Limpiar)
         Button btnStats      = findViewById(R.id.btnStats);
-        Button btnRedo      = findViewById(R.id.btnRedo);
-        Button btnClear     = findViewById(R.id.btnClear);
+        Button btnRonda      = findViewById(R.id.btnRonda);
+        Button btnMission     = findViewById(R.id.btnMission);
 
         // Botón "Construir" que abre el menú para crear elementos (casa, etc.)
         Button btnConstruir = findViewById(R.id.btnConstruir);
@@ -101,8 +191,39 @@ public class MainActivity extends AppCompatActivity {
 
         // setOnClickListener “escucha” pulsaciones. Con lambda (Java 8) queda más corto.
         btnStats.setOnClickListener(v -> showStatsDialog());
-        btnRedo.setOnClickListener(v -> drawingView.redo());          // Rehacer lo deshecho.
-        btnClear.setOnClickListener(v -> drawingView.clearCanvas());  // Borrar todo el lienzo.
+
+        btnRonda.setOnClickListener(v -> {
+            if (ronda == 1 && casas == 3) {
+                ronda++;
+                Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
+            }
+
+            if (ronda == 2 && ayuntamiento == 1 && tienda == 1) {
+                ronda++;
+                Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
+            }
+
+            if (ronda == 3 && farolas == 4 && seguridad == 4){
+                ronda ++;
+                Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
+            }
+
+            if (ronda == 4 && estacionpolicial == 1 && policia == 1 && casas == 4) {
+                ronda ++;
+                Toast.makeText(this, "¡Ronda " + ronda + "!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "¡Debes completar las misiones antes de cambiar de ronda!", Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+        btnMission.setOnClickListener(v -> showMission());  // Misión por nivel
 
         // ----------- 3) CONFIGURAR EL SPINNER DE COLORES -----------
 
@@ -166,20 +287,29 @@ public class MainActivity extends AppCompatActivity {
                     if (money >= 1000) {
                         money = money - 1000;
                         experience = experience + 10;
+                        happiness ++;
+                        casas ++;
                         crearEdificio(root, panelBotonera, R.drawable.casa, 96); // 96dp
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        happiness --; // Quito 1 de felicidad porque la construcción se ha cancelado
                     }
                     return true;
                 }
                 // Si elige "Tarraco"
                 else if (itemId == R.id.action_tarraco) {
-                    if (money >= 50000) {
+                    if (money >= 50000 && tarraco == 0) {
                         money = money - 50000;
                         experience = experience + 500;
+                        happiness = happiness + 10;
+                        Toast.makeText(this, "¡Has construido tu primera distribuidora de productos!", Toast.LENGTH_SHORT).show();
                         crearEdificio(root, panelBotonera, R.drawable.tarraco, 120); // 120dp
-                    } else {
-                        Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        tarraco++;
+                    } else if (tarraco == 1) {
+                        Toast.makeText(this, "¡Ya tienes un edificio de Tarraco! ¿Qué te parece si construimos otra cosa?", Toast.LENGTH_SHORT).show();
+                    } else if (money <= 5000) {
+                        Toast.makeText(this, "¡No tienes suficiente dinero!", Toast.LENGTH_SHORT).show();
+                        happiness = happiness - 5;
                     }
                     return true;
                 }
@@ -188,9 +318,11 @@ public class MainActivity extends AppCompatActivity {
                     if (money >= 20000) {
                         money = money - 20000;
                         experience = experience + 100;
+                        happiness = happiness + 10;
                         crearEdificio(root, panelBotonera, R.drawable.ayuntamiento, 120);
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        happiness = happiness - 10;
                     }
                     return true;
                 }
@@ -199,9 +331,11 @@ public class MainActivity extends AppCompatActivity {
                     if (money >= 5000) {
                         money = money - 5000;
                         experience = experience + 30;
+                        happiness ++;
                         crearEdificio(root, panelBotonera, R.drawable.primaprix, 120);
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        happiness --;
                     }
                     return true;
                 }
@@ -210,9 +344,11 @@ public class MainActivity extends AppCompatActivity {
                     if (money >= 6000){
                         money = money - 6000;
                         experience = experience + 30;
+                        happiness ++;
                         crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                        happiness --;
                     }
                     return true;
                 }
@@ -222,12 +358,13 @@ public class MainActivity extends AppCompatActivity {
                         money = money - 7000;
                         experience = experience + 30;
                         crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
+                        happiness ++;
                     } else {
                         crearEdificio(root, panelBotonera, R.drawable.marvimundo, 120);
+                        happiness --;
                     }
                     return true;
                 }
-
                 return false; // No gestionamos otras opciones
             });
 
