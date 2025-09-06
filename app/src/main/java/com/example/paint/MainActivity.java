@@ -13,23 +13,106 @@ import android.view.View;                  // Clase base para todos los elemento
 import android.widget.AdapterView;         // Callback para selección en Spinner.
 import android.widget.ArrayAdapter;        // Adaptador sencillo para listas/Spinner.
 import android.widget.Button;              // Botón normal.
+import android.widget.EditText;            // Campo de texto editable.
 import android.widget.FrameLayout;         // Contenedor que apila vistas (como “capas”).
 import android.widget.ImageView;           // Para mostrar imágenes en pantalla.
 import android.widget.PopupMenu;           // Menú contextual emergente anclado a un botón.
 import android.widget.Spinner;             // Desplegable para elegir una opción (colores).
-import androidx.appcompat.app.AlertDialog;
+import android.widget.Toast;               // Mensajes breves en pantalla (notificaciones tipo “toast”).
+
+import android.content.Intent;             // Para lanzar nuevas Activities o acciones del sistema.
+import android.content.SharedPreferences;  // Para guardar/cargar datos simples (autoguardado).
+
 import androidx.activity.EdgeToEdge;       // Permite que la UI ocupe toda la pantalla.
+import androidx.appcompat.app.AlertDialog; // Cuadros de diálogo nativos.
 import androidx.appcompat.app.AppCompatActivity; // Clase base de una pantalla (Activity).
 import androidx.core.graphics.Insets;      // Tamaños de las barras del sistema (status/nav).
 import androidx.core.view.ViewCompat;      // Utilidades para trabajar con vistas de forma moderna.
 import androidx.core.view.WindowInsetsCompat; // Acceso unificado a los "insets" del sistema.
-import android.widget.Toast;
+import java.util.ArrayList;                // Lista en memoria de edificios
+import org.json.JSONArray;                 // Serializar lista -> JSON
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /*
  * Una Activity es una PANTALLA de tu app.
  * MainActivity es la pantalla principal que se lanza al abrir la app.
  */
+
+
 public class MainActivity extends AppCompatActivity {
+    // Arriba, junto a tus variables del juego:
+    private SharedPreferences prefs;
+
+    // --- AUTOGUARDADO ---
+    private void saveGame() {
+        if (prefs == null) return;
+        SharedPreferences.Editor e = prefs.edit();
+        e.putInt("money", money);
+        e.putInt("experience", experience);
+        e.putInt("buildingsCount", buildingsCount);
+        e.putInt("happiness", happiness);
+        e.putInt("ronda", ronda);
+        e.putInt("tarraco", tarraco);
+        e.putInt("poblation", poblation);
+        e.putInt("casas", casas);
+        e.putInt("ayuntamiento", ayuntamiento);
+        e.putInt("farolas", farolas);
+        e.putInt("seguridad", seguridad);
+        e.putInt("estacionpolicial", estacionpolicial);
+        e.putInt("policia", policia);
+        e.putInt("impuestos", impuestos);
+        e.putInt("tienda", tienda);
+        e.putInt("porcentajeimpuestos", porcentajeimpuestos);
+        e.putInt("dinero1", dinero1);
+        e.putInt("dinero2", dinero2);
+        e.putInt("dinerototal", dinerototal);
+        // Guarda edificios como JSON
+        JSONArray arr = new JSONArray();
+        try {
+            for (Building b : buildingState) arr.put(b.toJson());
+        } catch (JSONException ignore) {}
+        e.putString("buildings_json", arr.toString());
+
+        e.apply(); // asíncrono y suficiente para juego
+    }
+
+    private void loadGame() {
+        if (prefs == null) return;
+        money            = prefs.getInt("money", money);
+        experience       = prefs.getInt("experience", experience);
+        buildingsCount   = prefs.getInt("buildingsCount", buildingsCount);
+        happiness        = prefs.getInt("happiness", happiness);
+        ronda            = prefs.getInt("ronda", ronda);
+        tarraco          = prefs.getInt("tarraco", tarraco);
+        poblation        = prefs.getInt("poblation", poblation);
+        casas            = prefs.getInt("casas", casas);
+        ayuntamiento     = prefs.getInt("ayuntamiento", ayuntamiento);
+        farolas          = prefs.getInt("farolas", farolas);
+        seguridad        = prefs.getInt("seguridad", seguridad);
+        estacionpolicial = prefs.getInt("estacionpolicial", estacionpolicial);
+        policia          = prefs.getInt("policia", policia);
+        impuestos        = prefs.getInt("impuestos", impuestos);
+        tienda           = prefs.getInt("tienda", tienda);
+        porcentajeimpuestos = prefs.getInt("porcentajeimpuestos", porcentajeimpuestos);
+        dinero1          = prefs.getInt("dinero1", dinero1);
+        dinero2          = prefs.getInt("dinero2", dinero2);
+        dinerototal      = prefs.getInt("dinerototal", dinerototal);
+        // Carga edificios como JSON
+        buildingState.clear();
+        String raw = prefs.getString("buildings_json", "[]");
+        try {
+            JSONArray arr = new JSONArray(raw);
+            for (int i = 0; i < arr.length(); i++) {
+                buildingState.add(Building.fromJson(arr.getJSONObject(i)));
+            }
+        } catch (JSONException ignore) {}
+
+    }
     private int money = 10000;   // saldo inicial
     private int experience = 0;    // puntos de experiencia
     private int buildingsCount = 0;
@@ -53,6 +136,37 @@ public class MainActivity extends AppCompatActivity {
     // Variables para recordar el desplazamiento entre el dedo y la vista al arrastrar.
     // dX y dY nos ayudan a que el objeto no "salte" cuando lo cogemos.
     private float dX, dY;
+
+    // ---- Estado de edificios ----
+    private static class Building {
+        int drawableId;
+        int sizeDp;
+        float x, y;
+
+        Building(int drawableId, int sizeDp, float x, float y) {
+            this.drawableId = drawableId; this.sizeDp = sizeDp; this.x = x; this.y = y;
+        }
+        JSONObject toJson() throws JSONException {
+            JSONObject o = new JSONObject();
+            o.put("drawableId", drawableId);
+            o.put("sizeDp", sizeDp);
+            o.put("x", x);
+            o.put("y", y);
+            return o;
+        }
+        static Building fromJson(JSONObject o) throws JSONException {
+            return new Building(
+                    o.getInt("drawableId"),
+                    o.getInt("sizeDp"),
+                    (float) o.getDouble("x"),
+                    (float) o.getDouble("y")
+            );
+        }
+    }
+
+    // Lista en memoria con el estado de los edificios
+    private final ArrayList<Building> buildingState = new ArrayList<>();
+
 
     /*
      * onCreate es el punto de entrada cuando Android crea esta pantalla.
@@ -157,6 +271,9 @@ public class MainActivity extends AppCompatActivity {
         // Ese XML define la jerarquía de vistas: lienzo, botones, etc.
         setContentView(R.layout.activity_main);
 
+        prefs = getSharedPreferences("pixeltown_save", MODE_PRIVATE);
+        loadGame();
+
         // Ajuste automático de "padding" para que el contenido no quede tapado por las barras.
         // findViewById(R.id.main) obtiene la vista raíz del layout (con ese id en el XML).
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -187,10 +304,13 @@ public class MainActivity extends AppCompatActivity {
 
         // "root" es el contenedor principal (FrameLayout) donde añadiremos casas nuevas.
         View root           = findViewById(R.id.main);
+        View panelBotonera  = findViewById(R.id.panelBotonera);
+        // Restaurar edificios guardados
+        root.post(() -> restoreBuildings(root, panelBotonera));
 
         // panelBotonera es el contenedor inferior con los botones.
         // Lo usamos para no permitir que las casas/edificios “pisen” esa zona al arrastrar.
-        View panelBotonera  = findViewById(R.id.panelBotonera);
+
 
         // ----------- 2) CONECTAR BOTONES DEL LIENZO A SUS ACCIONES -----------
 
@@ -307,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
                         happiness ++;
                         casas ++;
                         crearEdificio(root, panelBotonera, R.drawable.casa, 96); // 96dp
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --; // Quito 1 de felicidad porque la construcción se ha cancelado
@@ -322,6 +443,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "¡Has construido tu primera distribuidora de productos!", Toast.LENGTH_SHORT).show();
                         crearEdificio(root, panelBotonera, R.drawable.tarraco, 120); // 120dp
                         tarraco++;
+                        saveGame();
                     } else if (tarraco == 1) {
                         Toast.makeText(this, "¡Ya tienes un edificio de Tarraco! ¿Qué te parece si construimos otra cosa?", Toast.LENGTH_SHORT).show();
                     } else if (money <= 5000) {
@@ -337,6 +459,7 @@ public class MainActivity extends AppCompatActivity {
                         experience = experience + 100;
                         happiness = happiness + 10;
                         crearEdificio(root, panelBotonera, R.drawable.ayuntamiento, 120);
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness = happiness - 10;
@@ -349,7 +472,9 @@ public class MainActivity extends AppCompatActivity {
                         money = money - 5000;
                         experience = experience + 30;
                         happiness ++;
+                        tienda ++;
                         crearEdificio(root, panelBotonera, R.drawable.primaprix, 120);
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --;
@@ -362,7 +487,9 @@ public class MainActivity extends AppCompatActivity {
                         money = money - 6000;
                         experience = experience + 30;
                         happiness ++;
+                        tienda ++;
                         crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --;
@@ -374,8 +501,10 @@ public class MainActivity extends AppCompatActivity {
                     if (money >= 7000){
                         money = money - 7000;
                         experience = experience + 30;
+                        tienda ++;
                         crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
                         happiness ++;
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --;
@@ -389,6 +518,7 @@ public class MainActivity extends AppCompatActivity {
                         experience = experience + 35;
                         crearEdificio(root, panelBotonera, R.drawable.estacionpolicial, 120);
                         happiness ++;
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --;
@@ -402,6 +532,7 @@ public class MainActivity extends AppCompatActivity {
                         experience = experience + 5;
                         crearEdificio(root, panelBotonera, R.drawable.camaradeseguridad, 50);
                         happiness ++;
+                        saveGame();
                     } else {
                         Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
                         happiness --;
@@ -416,6 +547,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveGame();
+    }
+
+
     /*
      * Función auxiliar para crear un edificio dinámicamente en el mapa.
      * - Lo crea como ImageView con el drawable que le pases.
@@ -425,59 +563,91 @@ public class MainActivity extends AppCompatActivity {
      * - Lo hace arrastrable sin invadir la botonera ni salirse de la pantalla.
      */
     private void crearEdificio(View root, View panelBotonera, int drawableId, int sizeDp) {
-        // ----- A) Crear la imagen -----
         ImageView edificio = new ImageView(this);
         edificio.setImageResource(drawableId);
 
-        // ----- B) Asignar tamaño (dp → px) -----
         int sizePx = dp(sizeDp);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(sizePx, sizePx);
         edificio.setLayoutParams(params);
 
-        // ----- C) Añadir al contenedor principal -----
         ((FrameLayout) root).addView(edificio);
         buildingsCount++;
 
-        // ----- D) Posición inicial (centrado en zona útil) -----
+        // Crear estado y asociarlo
+        Building b = new Building(drawableId, sizeDp, 0f, 0f);
+        edificio.setTag(b);
+        buildingState.add(b);
+
         root.post(() -> {
             float cx = (root.getWidth() - edificio.getWidth()) / 2f;
-            float maxY = root.getHeight()
-                    - panelBotonera.getHeight()
-                    - edificio.getHeight();
+            float maxY = root.getHeight() - panelBotonera.getHeight() - edificio.getHeight();
             float cy = Math.max(0, maxY / 2f);
 
             edificio.setX(Math.max(0, cx));
             edificio.setY(cy);
+
+            // Guardar posición en el estado
+            b.x = edificio.getX();
+            b.y = edificio.getY();
+
+            saveGame(); // guardado inmediato
         });
 
-        // ----- E) Hacer el edificio arrastrable -----
-        edificio.setOnTouchListener((viewTouch, event) -> {
+        attachDragBehavior(edificio, root, panelBotonera);
+    }
+
+    private void restoreBuildings(View root, View panelBotonera) {
+        for (Building b : buildingState) {
+            crearEdificioDesdeEstado(root, panelBotonera, b);
+        }
+    }
+
+    private void crearEdificioDesdeEstado(View root, View panelBotonera, Building b) {
+        ImageView iv = new ImageView(this);
+        iv.setImageResource(b.drawableId);
+        int sizePx = dp(b.sizeDp);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(sizePx, sizePx);
+        iv.setLayoutParams(params);
+        ((FrameLayout) root).addView(iv);
+        buildingsCount++;
+
+        iv.setX(b.x);
+        iv.setY(b.y);
+
+        iv.setTag(b);
+        attachDragBehavior(iv, root, panelBotonera);
+    }
+
+    private void attachDragBehavior(ImageView viewTouch, View root, View panelBotonera) {
+        viewTouch.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                    // Guardamos offset dedo-vista
-                    dX = viewTouch.getX() - event.getRawX();
-                    dY = viewTouch.getY() - event.getRawY();
+                    dX = v.getX() - event.getRawX();
+                    dY = v.getY() - event.getRawY();
                     return true;
-
                 case MotionEvent.ACTION_MOVE:
-                    // Nueva posición sumando offset
                     float newX = event.getRawX() + dX;
                     float newY = event.getRawY() + dY;
 
-                    // Límites
-                    float maxX = root.getWidth() - viewTouch.getWidth();
-                    float maxY2 = root.getHeight()
-                            - panelBotonera.getHeight()
-                            - viewTouch.getHeight();
+                    float maxX = root.getWidth() - v.getWidth();
+                    float maxY2 = root.getHeight() - panelBotonera.getHeight() - v.getHeight();
 
-                    // Recortamos dentro de [0, max]
-                    viewTouch.setX(Math.max(0, Math.min(newX, maxX)));
-                    viewTouch.setY(Math.max(0, Math.min(newY, maxY2)));
+                    v.setX(Math.max(0, Math.min(newX, maxX)));
+                    v.setY(Math.max(0, Math.min(newY, maxY2)));
+
+                    // Actualiza posición en el estado
+                    Object tag = v.getTag();
+                    if (tag instanceof Building) {
+                        Building b = (Building) tag;
+                        b.x = v.getX();
+                        b.y = v.getY();
+                    }
                     return true;
             }
             return false;
         });
     }
+
 
     /*
      * Función de utilidad: convierte "dp" a "px".
