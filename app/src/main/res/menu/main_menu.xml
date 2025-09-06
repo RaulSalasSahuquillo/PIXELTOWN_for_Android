@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Muestra un botón en la Toolbar que abre tu popup "Construir" -->
+    <item
+        android:id="@+id/action_construir"
+        android:title="Construir"
+        app:showAsAction="ifRoom|withText" />
+
+    <!-- Cambiar color del pincel (abre diálogo) -->
+    <item
+        android:id="@+id/action_color"
+        android:title="Color del pincel"
+        app:showAsAction="never" />
+
+    <!-- Avanzar de ronda (valida misiones) -->
+    <item
+        android:id="@+id/action_ronda"
+        android:title="Cambiar ronda"
+        app:showAsAction="never" />
+
+    <!-- Ver misión actual -->
+    <item
+        android:id="@+id/action_mision"
+        android:title="Misión actual"
+        app:showAsAction="never" />
+
+    <!-- Ver estadísticas -->
+    <item
+        android:id="@+id/action_stats"
+        android:title="Estadísticas"
+        app:showAsAction="never" />
+</menu>
+

@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Toolbar arriba (superpuesta); al usar marginTop en el lienzo no se pisan -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="top"
+        android:background="?attr/colorPrimary"
+        app:title="PIXELTOWN"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <!-- Lienzo -->
     <com.example.paint.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <!-- Casa arrastrable: está sobre el lienzo y empieza oculta -->
     <ImageView
@@ -21,7 +32,7 @@
         android:visibility="gone"
         android:contentDescription="@string/app_name" />
 
-    <!-- Botonera inferior (SIEMPRE arriba del resto) -->
+    <!-- Botonera inferior (puedes ocultarla si usas el menú de la Toolbar) -->
     <LinearLayout
         android:id="@+id/panelBotonera"
         android:layout_width="match_parent"
@@ -29,7 +40,8 @@
         android:layout_gravity="bottom"
         android:background="#80FFFFFF"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <!-- Fila superior: Colores + Construir -->
         <LinearLayout
@@ -51,14 +63,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:entries="@array/color_names" />
+                android:entries="@array/color_names"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnConstruir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="Construir"/>
+                android:text="Construir"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <!-- Fila inferior: acciones -->
@@ -66,7 +80,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/btnStats"
@@ -93,3 +108,4 @@
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
+

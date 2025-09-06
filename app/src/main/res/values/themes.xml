@@ -1,8 +1,24 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.Paint" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowNoTitle">true</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Tema sin ActionBar para usar Toolbar propia.
+      "DayNight" cambia colores del sistema automáticamente según el modo oscuro.
+    -->
+    <style name="Theme.Paint" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Colores base para AppCompat -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryVariant</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+
+        <!-- Fondo y superficies (si los usas en layouts) -->
+        <item name="android:colorBackground">@color/colorBackground</item>
+
+        <!-- Edge-to-edge: barras transparentes (API 21+) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Tema emergente claro para menús de la Toolbar (tu popupTheme) -->
+        <!-- Puedes cambiar a ThemeOverlay.AppCompat.Dark si prefieres menú oscuro -->
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 </resources>
