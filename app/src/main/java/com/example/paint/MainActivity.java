@@ -19,6 +19,18 @@ import android.widget.Spinner;             // Desplegable para elegir una opció
 import android.widget.Toast;               // Mensajes breves en pantalla (notificaciones tipo “toast”).
 import androidx.appcompat.widget.Toolbar;  // Barra superior (app bar)
 import android.view.Menu;                  // Para inflar el menú en la toolbar
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.AttributeSet;
+import android.view.View;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
+import android.widget.ImageView;
+
+// Si el código va en MainActivity:
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;  // Para guardar/cargar datos simples (autoguardado).
 
@@ -162,6 +174,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        ImageView bg = findViewById(R.id.bg);
+
+// Tamaño de pantalla aproximado para escalar
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        int reqW = dm.widthPixels;
+        int reqH = dm.heightPixels;
+
+        BitmapFactory.Options o = new BitmapFactory.Options();
+// 1) Sólo medir
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(getResources(), R.drawable.fondoo, o);
+
+// 2) Calcular inSampleSize (potencia de 2)
+        int inSample = 1;
+        int halfH = o.outHeight / 2;
+        int halfW = o.outWidth / 2;
+        while ((halfH / inSample) >= reqH && (halfW / inSample) >= reqW) {
+            inSample *= 2;
+        }
+
+// 3) Decodificar ya escalado y en formato que gasta menos RAM
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inJustDecodeBounds = false;
+        o2.inSampleSize = inSample;
+        o2.inPreferredConfig = Bitmap.Config.RGB_565; // 50% menos memoria que ARGB_8888
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.fondoo, o2);
+
+// 4) Asignar
+        bg.setImageBitmap(bmp);
+
 
         // Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
