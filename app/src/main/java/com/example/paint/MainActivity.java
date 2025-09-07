@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private int dinero2 = 34000;
     private int dinerototal = 0;
 
+
     // Variables para recordar el desplazamiento al arrastrar edificios
     private float dX, dY;
 
