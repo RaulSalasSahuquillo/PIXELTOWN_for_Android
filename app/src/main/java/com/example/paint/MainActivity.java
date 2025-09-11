@@ -432,6 +432,34 @@ public class MainActivity extends AppCompatActivity {
                     happiness--;
                 }
                 return true;
+
+            } else if (itemId == R.id.action_policia) {
+                if (money >= 2500) {
+                    money -= 2500;
+                    experience += 400;
+                    policia++; // opcional si así llevas la cuenta
+                    crearEdificio(root, panelBotonera, R.drawable.policiaestable, 50);
+                    happiness++;
+                    saveGame();
+                } else {
+                    Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    happiness--;
+                }
+                return true;
+
+            } else if (itemId == R.id.action_farola) {
+                if (money >= 100) {
+                    money -= 100;
+                    experience += 6;
+                    farolas = 1;
+                    crearEdificio(root, panelBotonera, R.drawable.farola, 120);
+                    happiness++;
+                    saveGame();
+                } else {
+                    Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
+                    happiness--;
+                }
+                return true;
             }
             return false;
         });

@@ -24,5 +24,11 @@
     <item
         android:id="@+id/action_camara"
         android:title="Cámara de seguridad | 50Հ" />
+    <item
+        android:id="@+id/action_farola"
+        android:title="Farola | 100Հ" />
+    <item
+        android:id="@+id/action_policia"
+        android:title="Farola | 2500Հ" />
 
 </menu>
