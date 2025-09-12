@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Paint</string>
+    <string name="app_name">PIXELTOWN</string>
 
     <string-array name="color_names">
         <item>Negro</item>
