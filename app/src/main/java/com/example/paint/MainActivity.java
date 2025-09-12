@@ -3,48 +3,42 @@ package com.example.paint; // <- El "paquete" agrupa archivos Java. Debe coincid
 /*
  * Importamos clases de Android que vamos a usar.
  * Piensa en "import" como traer herramientas a tu archivo.
+ * He dejado solo las realmente utilizadas para mantener el archivo limpio.
  */
-import android.graphics.Color;              // Colores básicos (BLACK, RED, etc).
-import android.os.Bundle;                  // Objeto con datos del estado al crear la Activity.
-import android.util.TypedValue;            // Para convertir dp -> px de forma correcta.
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+
+import android.view.GestureDetector;        // Detecta gestos "un dedo" (scroll, doble-tap, etc.)
+import android.view.Menu;                  // Para inflar el menú en la toolbar
 import android.view.MenuItem;              // Representa un elemento pulsado en un menú.
 import android.view.MotionEvent;           // Eventos de toque (down/move/up) para arrastrar.
+import android.view.ScaleGestureDetector;  // Detecta gesto de pinza (zoom)
 import android.view.View;                  // Clase base para todos los elementos de UI.
-import android.widget.ArrayAdapter;        // Adaptador sencillo para listas/Spinner. (si mantienes spinner)
-import android.widget.Button;              // Botón normal. (si mantienes botonera)
+
 import android.widget.FrameLayout;         // Contenedor que apila vistas (como “capas”).
 import android.widget.ImageView;           // Para mostrar imágenes en pantalla.
 import android.widget.PopupMenu;           // Menú contextual emergente anclado a un botón o toolbar.
-import android.widget.Spinner;             // Desplegable para elegir una opción (colores). (si mantienes spinner)
 import android.widget.Toast;               // Mensajes breves en pantalla (notificaciones tipo “toast”).
-import androidx.appcompat.widget.Toolbar;  // Barra superior (app bar)
-import android.view.Menu;                  // Para inflar el menú en la toolbar
-import android.content.Context;
-import android.graphics.Canvas;
-import android.util.AttributeSet;
-import android.view.View;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.DisplayMetrics;
-import android.widget.ImageView;
-
-// Si el código va en MainActivity:
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.SharedPreferences;  // Para guardar/cargar datos simples (autoguardado).
 
 import androidx.activity.EdgeToEdge;       // Permite que la UI ocupe toda la pantalla.
 import androidx.appcompat.app.AlertDialog; // Cuadros de diálogo nativos.
 import androidx.appcompat.app.AppCompatActivity; // Clase base de una pantalla (Activity).
+import androidx.appcompat.widget.Toolbar;  // Barra superior (app bar)
 import androidx.core.graphics.Insets;      // Tamaños de las barras del sistema (status/nav).
 import androidx.core.view.ViewCompat;      // Utilidades para trabajar con vistas de forma moderna.
 import androidx.core.view.WindowInsetsCompat; // Acceso unificado a los "insets" del sistema.
 
-import java.util.ArrayList;                // Lista en memoria de edificios
+import android.content.SharedPreferences;  // Para guardar/cargar datos simples (autoguardado).
+
 import org.json.JSONArray;                 // Serializar lista -> JSON
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;                // Lista en memoria de edificios
 
 /*
  * Una Activity es una PANTALLA de tu app.
@@ -56,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private DrawingView drawingView; // para cambiar color/grosor desde el menú
 
+    // --- Estado "tipo juego" (tu lógica actual) ---
     private int money = 10000;   // saldo inicial
     private int experience = 0;  // puntos de experiencia
     private int buildingsCount = 0;
@@ -75,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     private int dinero1 = 1000;
     private int dinero2 = 34000;
     private int dinerototal = 0;
-
 
     // Variables para recordar el desplazamiento al arrastrar edificios
     private float dX, dY;
@@ -168,25 +162,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // ===== Zoom / Pan (NUEVO) =====
+    /*
+     * La idea: todo lo que deba hacer zoom/arrastrarse está dentro de un contenedor
+     * con id @id/world. Le aplicamos transformaciones (escala + traslación) con gestos.
+     */
+    private ScaleGestureDetector scaleDetector; // pinch-to-zoom
+    private GestureDetector gestureDetector;    // pan (arrastre) y doble-tap
+    private float scale = 1f;                   // escala actual (1 = 100%)
+    private static final float MIN_SCALE = 0.5f, MAX_SCALE = 3f; // límites de zoom
+    private float panX = 0f, panY = 0f;         // desplazamiento actual
+
+    private View world;      // contenedor que se escala y mueve
+    private ImageView bg;    // fondo del mapa
+
+    // Para limitar el pan según tamaño de contenido y de la pantalla
+    private int viewportW = 0, viewportH = 0;   // tamaño visible (pantalla)
+    private int contentW = 0, contentH = 0;     // tamaño "real" del contenido (bitmap fondo)
+
     // ===== Ciclo de vida =====
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ImageView bg = findViewById(R.id.bg);
 
-// Tamaño de pantalla aproximado para escalar
+        // --- Referencias principales ---
+        bg = findViewById(R.id.bg);
+        world = findViewById(R.id.world);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // --- Cargar fondo de forma segura/escalada ---
+        // Tamaño de pantalla aproximado para escalar
         DisplayMetrics dm = getResources().getDisplayMetrics();
         int reqW = dm.widthPixels;
         int reqH = dm.heightPixels;
 
         BitmapFactory.Options o = new BitmapFactory.Options();
-// 1) Sólo medir
+        // 1) Sólo medir
         o.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(getResources(), R.drawable.fondoo, o);
 
-// 2) Calcular inSampleSize (potencia de 2)
+        // 2) Calcular inSampleSize (potencia de 2) para no cargar más de lo necesario
         int inSample = 1;
         int halfH = o.outHeight / 2;
         int halfW = o.outWidth / 2;
@@ -194,41 +212,64 @@ public class MainActivity extends AppCompatActivity {
             inSample *= 2;
         }
 
-// 3) Decodificar ya escalado y en formato que gasta menos RAM
+        // 3) Decodificar ya escalado y en formato que gasta menos RAM
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inJustDecodeBounds = false;
         o2.inSampleSize = inSample;
         o2.inPreferredConfig = Bitmap.Config.RGB_565; // 50% menos memoria que ARGB_8888
         Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.fondoo, o2);
 
-// 4) Asignar
+        // 4) Asignar
         bg.setImageBitmap(bmp);
 
+        // --- Dimensiones del contenido (para límites de pan) ---
+        if (bg.getDrawable() != null) {
+            contentW = bg.getDrawable().getIntrinsicWidth();
+            contentH = bg.getDrawable().getIntrinsicHeight();
+        }
 
-        // Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // Preferencias y carga de estado
-        prefs = getSharedPreferences("pixeltown_save", MODE_PRIVATE);
-        loadGame();
-
-        // Referencias de vistas
-        View root = findViewById(R.id.main);
+        // --- Insets para edge-to-edge (sobre el root principal) ---
+        View mainRoot = findViewById(R.id.main);
         View panelBotonera = findViewById(R.id.panelBotonera);
         drawingView = findViewById(R.id.drawingView);
 
-        // Insets para edge-to-edge
-        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Restaurar edificios después de loadGame y de tener referencias
-        root.post(() -> restoreBuildings(root, panelBotonera));
+        // --- Preferencias y carga de estado (antes de restaurar posiciones) ---
+        prefs = getSharedPreferences("pixeltown_save", MODE_PRIVATE);
+        loadGame();
 
-        // Ocultar la botonera si ya usas la Toolbar (puedes quitar esta línea si quieres mostrarla)
+        // --- Medir viewport cuando el árbol esté listo ---
+        world.post(() -> {
+            viewportW = world.getWidth();
+            viewportH = world.getHeight();
+            applyTransform(); // estado inicial (escala/posición)
+            // Restaurar edificios después de medir y de tener estado cargado
+            restoreBuildings(world, panelBotonera);
+        });
+
+        // --- Detectores de gestos (pinch y pan) ---
+        scaleDetector = new ScaleGestureDetector(this, new ScaleListener());
+        gestureDetector = new GestureDetector(this, new GestureListener());
+
+        // --- Tocar el "mundo" = pan/zoom ---
+        world.setOnTouchListener((v, e) -> {
+            boolean s = scaleDetector.onTouchEvent(e); // pinch
+            boolean g = gestureDetector.onTouchEvent(e); // pan & double-tap
+            if (e.getActionMasked() == MotionEvent.ACTION_UP ||
+                    e.getActionMasked() == MotionEvent.ACTION_CANCEL) {
+                // Al soltar, limitamos pan y aplicamos transform
+                clampPan();
+                applyTransform();
+            }
+            return s || g; // consumimos si hubo gesto
+        });
+
+        // (Opcional) Oculta la botonera si usas solo la Toolbar
         if (panelBotonera != null) panelBotonera.setVisibility(View.GONE);
     }
 
@@ -248,13 +289,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        View root = findViewById(R.id.main);
+
+        // OJO: ahora "root" debe ser el contenedor que hace zoom (world)
+        View worldRoot = findViewById(R.id.world);
         View panelBotonera = findViewById(R.id.panelBotonera);
         Toolbar tb = findViewById(R.id.toolbar);
 
         if (id == R.id.action_construir) {
             // Reutilizamos tu menú de construir, anclado a la Toolbar
-            mostrarMenuConstruir(tb, root, panelBotonera);
+            mostrarMenuConstruir(tb, worldRoot, panelBotonera);
             return true;
 
         } else if (id == R.id.action_color) {
@@ -549,6 +592,7 @@ public class MainActivity extends AppCompatActivity {
         edificio.setTag(b);
         buildingState.add(b);
 
+        // Centramos el edificio recién creado y guardamos
         root.post(() -> {
             float cx = (root.getWidth() - edificio.getWidth()) / 2f;
             float maxY = root.getHeight() - (panelBotonera != null ? panelBotonera.getHeight() : 0) - edificio.getHeight();
@@ -627,7 +671,66 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getDisplayMetrics()
         ));
     }
+
+    // ===== Gestos y transformaciones (zoom/pan) =====
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override public boolean onScale(ScaleGestureDetector d) {
+            float prev = scale;
+            float next = Math.max(MIN_SCALE, Math.min(scale * d.getScaleFactor(), MAX_SCALE));
+
+            // Mantener el punto de enfoque "fijo" al escalar (zoom centrado en los dedos)
+            float fx = d.getFocusX(), fy = d.getFocusY();
+            panX = fx - (fx - panX) * (next / prev);
+            panY = fy - (fy - panY) * (next / prev);
+
+            scale = next;
+            clampPan();
+            applyTransform();
+            return true;
+        }
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override public boolean onDown(MotionEvent e) { return true; } // imprescindible para que onScroll dispare
+        @Override public boolean onScroll(MotionEvent e1, MotionEvent e2, float dx, float dy) {
+            // dx/dy = desplazamiento desde el último evento → pan en sentido contrario
+            panX -= dx;
+            panY -= dy;
+            clampPan();
+            applyTransform();
+            return true;
+        }
+        @Override public boolean onDoubleTap(MotionEvent e) {
+            // Reset rápido al centro (escala 1x)
+            scale = 1f; panX = 0f; panY = 0f;
+            applyTransform();
+            return true;
+        }
+    }
+
+    private void applyTransform() {
+        // Aplica escala y traslación al contenedor "world"
+        if (world == null) return;
+        world.setScaleX(scale);
+        world.setScaleY(scale);
+        world.setTranslationX(panX);
+        world.setTranslationY(panY);
+    }
+
+    private void clampPan() {
+        // Limita el pan para que no aparezcan bordes en blanco (si el contenido es >= viewport)
+        if (viewportW == 0 || viewportH == 0 || contentW == 0 || contentH == 0) return;
+
+        // tamaño del mundo escalado
+        float worldW = contentW * scale;
+        float worldH = contentH * scale;
+
+        // límites: permitimos como máximo posicionar el mundo de 0 a (viewport - mundo)
+        float minX = Math.min(0f, viewportW - worldW);
+        float minY = Math.min(0f, viewportH - worldH);
+        float maxX = 0f, maxY = 0f;
+
+        panX = Math.max(minX, Math.min(panX, maxX));
+        panY = Math.max(minY, Math.min(panY, maxY));
+    }
 }
-
-
-
