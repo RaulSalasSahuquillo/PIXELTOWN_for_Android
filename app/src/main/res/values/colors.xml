@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Primarios -->
-    <color name="colorPrimary">#1754A4</color>
+    <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryVariant">#4F378B</color>
     <color name="colorOnPrimary">#FFFFFF</color>
 
@@ -10,7 +10,7 @@
     <color name="colorOnSecondary">#000000</color>
 
     <!-- Fondos y superficies -->
-    <color name="colorBackground">#FFFFFFFF</color>
+    <color name="colorBackground">#CCFFD580</color>
     <color name="colorOnBackground">#FF000000</color>
 
     <color name="colorSurface">#FFFFFFFF</color>
