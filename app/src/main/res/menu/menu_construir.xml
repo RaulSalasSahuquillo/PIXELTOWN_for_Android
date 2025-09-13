@@ -29,6 +29,6 @@
         android:title="Farola | 100Հ" />
     <item
         android:id="@+id/action_policia"
-        android:title="Farola | 2500Հ" />
+        android:title="Policía | 2500Հ" />
 
 </menu>

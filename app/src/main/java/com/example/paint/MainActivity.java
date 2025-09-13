@@ -11,6 +11,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.content.DialogInterface;
+
 
 import android.view.GestureDetector;        // Detecta gestos "un dedo" (scroll, doble-tap, etc.)
 import android.view.Menu;                  // Para inflar el menú en la toolbar
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private int tarraco = 0;
     private int poblation = 3;
     private int casas = 0;
-    private int ayuntamiento = 1;
+    private int ayuntamiento = 0;
     private int farolas = 0;
     private int seguridad = 0;
     private int estacionpolicial = 0;
@@ -118,6 +120,29 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void showImpuestos() {
+        if (ronda == 1 || ronda == 2 || ronda == 3 || ronda == 4) {
+            String msg = "Los impuestos iniciales son del 15%.";
+            new AlertDialog.Builder(this).setTitle(" ").setMessage(msg)
+                    .setPositiveButton("CERRAR", null).show();
+        } else if (ronda == 5) {
+            String msg = "Los impuestos iniciales son del 15%. Vamos a subirlos solo un poco para poder construir más.";
+            new AlertDialog.Builder(this)
+                    .setTitle(" ")
+                    .setMessage(msg)
+                    .setPositiveButton("AUMENTAR IMPUESTOS UN 5%", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // 👇 Aquí escribes la acción que quieres que haga
+                            porcentajeimpuestos += 5; // por ejemplo, subir variable impuestos
+                            impuestos ++;
+                            Toast.makeText(MainActivity.this, "Impuestos aumentados al " + porcentajeimpuestos + "%", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .show();
+        }
+    }
+
     private void showMission() {
         if (ronda == 1){
             String msg = "Hay 3 habitantes (incluyéndote a tí). ¿Qué te parece si empezamos construyendo 3 casas?";
@@ -126,10 +151,6 @@ public class MainActivity extends AppCompatActivity {
         }
         if (ronda == 2 && ayuntamiento == 0) {
             String msg = "¿Pero cómo vas a gobernar? ¿Qué te parece si construimos un ayuntamiento?";
-            new AlertDialog.Builder(this).setTitle("Misiones").setMessage(msg)
-                    .setPositiveButton("MANOS A LA OBRA", null).show();
-        } else if ( ronda == 2 && ayuntamiento == 1) {
-            String msg = "Haz tu primer paso como gobernador. Construye una tienda";
             new AlertDialog.Builder(this).setTitle("Misiones").setMessage(msg)
                     .setPositiveButton("MANOS A LA OBRA", null).show();
         }
@@ -315,6 +336,9 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.action_stats) {
             showStatsDialog();
             return true;
+        } else if (id == R.id.action_impuestos) {
+            showImpuestos();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -337,8 +361,8 @@ public class MainActivity extends AppCompatActivity {
     private void intentarCambiarRonda() {
         boolean ok = false;
         if (ronda == 1 && casas == 3) ok = true;
-        else if (ronda == 2 && ayuntamiento == 1 && tienda == 1) ok = true;
-        else if (ronda == 3 && farolas == 4 && seguridad == 4) ok = true;
+        else if (ronda == 2 && ayuntamiento == 1) ok = true;
+        else if (ronda == 3 && farolas == 4 && seguridad == 5) ok = true;
         else if (ronda == 4 && estacionpolicial == 1 && policia == 1 && casas == 4) ok = true;
 
         if (!ok) {
@@ -393,8 +417,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             } else if (itemId == R.id.action_ayuntamiento) {
-                if (money >= 20000) {
-                    money -= 20000;
+                if (money >= 10000) {
+                    money -= 10000;
                     experience += 100;
                     happiness += 10;
                     ayuntamiento = 1;
@@ -494,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                 if (money >= 100) {
                     money -= 100;
                     experience += 6;
-                    farolas = 1;
+                    farolas ++;
                     crearEdificio(root, panelBotonera, R.drawable.farola, 120);
                     happiness++;
                     saveGame();

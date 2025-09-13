@@ -31,5 +31,11 @@
         android:id="@+id/action_stats"
         android:title="Estadísticas"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_impuestos"
+        android:title="Impuestos"
+        app:showAsAction="never" />
+
 </menu>
 
