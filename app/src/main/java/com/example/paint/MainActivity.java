@@ -391,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
                     experience += 10;
                     happiness++;
                     casas++;
-                    crearEdificio(root, panelBotonera, R.drawable.casa, 96);
+                    crearEdificio(root, panelBotonera, R.drawable.casa, 48);
                     saveGame();
                 } else {
                     Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
@@ -404,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
                     money -= 50000;
                     experience += 500;
                     happiness += 10;
-                    crearEdificio(root, panelBotonera, R.drawable.tarraco, 120);
+                    crearEdificio(root, panelBotonera, R.drawable.tarraco, 60);
                     tarraco++;
                     Toast.makeText(this, "¡Has construido tu primera distribuidora!", Toast.LENGTH_SHORT).show();
                     saveGame();
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
                     experience += 100;
                     happiness += 10;
                     ayuntamiento = 1;
-                    crearEdificio(root, panelBotonera, R.drawable.ayuntamiento, 120);
+                    crearEdificio(root, panelBotonera, R.drawable.ayuntamiento, 60);
                     saveGame();
                 } else {
                     Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
                     experience += 30;
                     happiness++;
                     tienda++;
-                    crearEdificio(root, panelBotonera, R.drawable.primaprix, 120);
+                    crearEdificio(root, panelBotonera, R.drawable.primaprix, 60);
                     saveGame();
                 } else {
                     Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
@@ -450,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
                     experience += 30;
                     happiness++;
                     tienda++;
-                    crearEdificio(root, panelBotonera, R.drawable.esclat, 120);
+                    crearEdificio(root, panelBotonera, R.drawable.esclat, 60);
                     saveGame();
                 } else {
                     Toast.makeText(this, "No tienes suficiente dinero", Toast.LENGTH_SHORT).show();
@@ -463,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
                     money -= 7000;
                     experience += 30;
                     tienda++;
-                    crearEdificio(root, panelBotonera, R.drawable.esclat, 120); // cambia drawable si tienes marvimundo
+                    crearEdificio(root, panelBotonera, R.drawable.esclat, 60); // cambia drawable si tienes marvimundo
                     happiness++;
                     saveGame();
                 } else {
@@ -477,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
                     money -= 8000;
                     experience += 35;
                     estacionpolicial = 1;
-                    crearEdificio(root, panelBotonera, R.drawable.estacionpolicial, 120);
+                    crearEdificio(root, panelBotonera, R.drawable.estacionpolicial, 60);
                     happiness++;
                     saveGame();
                 } else {
@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity {
                     money -= 50;
                     experience += 5;
                     seguridad++; // opcional si así llevas la cuenta
-                    crearEdificio(root, panelBotonera, R.drawable.camaradeseguridad, 50);
+                    crearEdificio(root, panelBotonera, R.drawable.camaradeseguridad, 25);
                     happiness++;
                     saveGame();
                 } else {
@@ -505,7 +505,7 @@ public class MainActivity extends AppCompatActivity {
                     money -= 2500;
                     experience += 400;
                     policia++; // opcional si así llevas la cuenta
-                    crearEdificio(root, panelBotonera, R.drawable.policiaestable, 50);
+                    crearEdificio(root, panelBotonera, R.drawable.policiaestable, 25);
                     happiness++;
                     saveGame();
                 } else {
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity {
                     money -= 100;
                     experience += 6;
                     farolas ++;
-                    crearEdificio(root, panelBotonera, R.drawable.farola, 120);
+                    crearEdificio(root, panelBotonera, R.drawable.farola, 60);
                     happiness++;
                     saveGame();
                 } else {
